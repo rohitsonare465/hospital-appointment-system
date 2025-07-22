@@ -33,7 +33,7 @@ const Dashboard = () => {
             navigate('/login');
         } else {
             setUser(currentUser.data.user);
-            fetchAppointmentStats(currentUser.data.user.id);
+            fetchAppointmentStats(currentUser.data.user._id);
         }
     }, [navigate]);
 

@@ -77,7 +77,7 @@ export const cancelAppointment = async (id, reason = '') => {
     }
 };
 
-// Get doctor availability
+// Get doctor availability 
 export const getDoctorAvailability = async (doctorId, date) => {
     try {
         const authAxios = createAuthAxios();

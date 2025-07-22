@@ -8,7 +8,6 @@ A comprehensive hospital appointment management system with separate frontend an
 hospital-appointment-system/
 ├── frontend/          # React.js frontend application
 ├── backend/           # Node.js/Express backend API
-├── demo.sh           # Demo script for testing
 └── README.md         # This file
 ```
 
@@ -82,11 +81,6 @@ npm start             # Start development server
 - **Patient**: `test.patient@test.com / password123`
 
 ## Scripts
-
-### Root Directory
-```bash
-./demo.sh             # Run comprehensive demo and tests
-```
 
 ### Backend Scripts
 ```bash

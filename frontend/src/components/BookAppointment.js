@@ -22,14 +22,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Autocomplete,
   Avatar,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
   Divider,
-  Rating
+  Rating,
+  Autocomplete
 } from '@mui/material';
 import {
   DatePicker,
@@ -44,8 +40,7 @@ import {
   AccessTime,
   Phone,
   Email,
-  LocalHospital,
-  Add
+  LocalHospital
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form } from 'formik';
@@ -57,7 +52,8 @@ import { getCurrentUser } from '../services/auth.service';
 import { 
   createAppointment, 
   getDoctorAvailability,
-  formatDateForAPI 
+  formatDateForAPI,
+  getTimeSlots
 } from '../services/appointment.service';
 
 const steps = ['Select Doctor', 'Choose Date & Time', 'Enter Details', 'Confirm'];
@@ -125,12 +121,22 @@ const BookAppointment = () => {
   const fetchAvailability = async (doctorId, date) => {
     try {
       setLoading(true);
+      console.log('Fetching availability for doctor:', doctorId, 'date:', formatDateForAPI(date));
       const response = await getDoctorAvailability(doctorId, formatDateForAPI(date));
+      console.log('Availability response:', response);
       setAvailability(response.data);
       setAvailableTimes(response.data.availableTimes || []);
     } catch (error) {
       console.error('Error fetching availability:', error);
-      setAvailableTimes([]);
+      // Fallback to default time slots if API fails
+      const defaultSlots = getTimeSlots();
+      console.log('Using fallback time slots:', defaultSlots);
+      setAvailableTimes(defaultSlots);
+      setAvailability({ 
+        date: formatDateForAPI(date),
+        availableTimes: defaultSlots,
+        doctorId: doctorId
+      });
     } finally {
       setLoading(false);
     }
@@ -365,7 +371,7 @@ const BookAppointment = () => {
                             </Typography>
                             {loading ? (
                               <CircularProgress size={24} />
-                            ) : (
+                            ) : availableTimes.length > 0 ? (
                               <Grid container spacing={1}>
                                 {availableTimes.map((time) => (
                                   <Grid item key={time}>
@@ -380,6 +386,10 @@ const BookAppointment = () => {
                                   </Grid>
                                 ))}
                               </Grid>
+                            ) : (
+                              <Alert severity="info" sx={{ mt: 1 }}>
+                                No time slots available for this date. Please select a different date.
+                              </Alert>
                             )}
                           </Box>
                         )}

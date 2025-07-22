@@ -19,7 +19,14 @@ import {
   Menu,
   MenuItem,
   Badge,
-  LinearProgress
+  LinearProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import {
   Add,
@@ -56,6 +63,9 @@ import {
 const AppointmentCard = ({ appointment, onUpdate, onCancel, userRole }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [cancelDialog, setCancelDialog] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState(false);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -69,12 +79,50 @@ const AppointmentCard = ({ appointment, onUpdate, onCancel, userRole }) => {
     setLoading(true);
     try {
       await updateAppointmentStatus(appointment._id, status);
+      setNotification({
+        open: true,
+        message: `Appointment ${status === 'confirmed' ? 'confirmed' : 'marked as completed'} successfully`,
+        severity: 'success'
+      });
       onUpdate();
     } catch (error) {
       console.error('Error updating status:', error);
+      setNotification({
+        open: true,
+        message: error.message || 'Failed to update appointment status',
+        severity: 'error'
+      });
     } finally {
       setLoading(false);
       handleMenuClose();
+    }
+  };
+
+  const openConfirmDialog = () => {
+    setConfirmDialog(true);
+    handleMenuClose();
+  };
+
+  const handleConfirmAppointment = async () => {
+    setLoading(true);
+    try {
+      await updateAppointmentStatus(appointment._id, 'confirmed');
+      setNotification({
+        open: true,
+        message: 'Appointment confirmed successfully',
+        severity: 'success'
+      });
+      onUpdate();
+    } catch (error) {
+      console.error('Error confirming appointment:', error);
+      setNotification({
+        open: true,
+        message: error.message || 'Failed to confirm appointment',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+      setConfirmDialog(false);
     }
   };
 
@@ -82,13 +130,29 @@ const AppointmentCard = ({ appointment, onUpdate, onCancel, userRole }) => {
     setLoading(true);
     try {
       await cancelAppointment(appointment._id, 'Cancelled by user');
+      setNotification({
+        open: true,
+        message: 'Appointment cancelled successfully',
+        severity: 'success'
+      });
       onUpdate();
     } catch (error) {
       console.error('Error cancelling appointment:', error);
+      setNotification({
+        open: true,
+        message: error.message || 'Failed to cancel appointment',
+        severity: 'error'
+      });
     } finally {
       setLoading(false);
+      setCancelDialog(false);
       handleMenuClose();
     }
+  };
+
+  const openCancelDialog = () => {
+    setCancelDialog(true);
+    handleMenuClose();
   };
 
   const formatDate = (date) => {
@@ -220,6 +284,72 @@ const AppointmentCard = ({ appointment, onUpdate, onCancel, userRole }) => {
             </Typography>
           </Box>
         )}
+
+        {/* Quick Action Buttons */}
+        {(userRole === 'doctor' && appointment.status === 'pending') && (
+          <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button
+              size="small"
+              variant="contained"
+              color="success"
+              onClick={openConfirmDialog}
+              startIcon={<Check />}
+              disabled={loading}
+            >
+              Confirm
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={openCancelDialog}
+              startIcon={<Cancel />}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+          </Box>
+        )}
+
+        {(userRole === 'doctor' && appointment.status === 'confirmed') && (
+          <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button
+              size="small"
+              variant="contained"
+              color="primary"
+              onClick={() => handleStatusUpdate('completed')}
+              startIcon={<Check />}
+              disabled={loading}
+            >
+              Mark Completed
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={openCancelDialog}
+              startIcon={<Cancel />}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+          </Box>
+        )}
+
+        {(userRole === 'patient' && ['pending', 'confirmed'].includes(appointment.status)) && (
+          <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={openCancelDialog}
+              startIcon={<Cancel />}
+              disabled={loading}
+            >
+              Cancel Appointment
+            </Button>
+          </Box>
+        )}
       </CardContent>
 
       <Menu
@@ -233,7 +363,7 @@ const AppointmentCard = ({ appointment, onUpdate, onCancel, userRole }) => {
         </MenuItem>
         
         {userRole === 'doctor' && appointment.status === 'pending' && (
-          <MenuItem onClick={() => handleStatusUpdate('confirmed')}>
+          <MenuItem onClick={openConfirmDialog}>
             <Check sx={{ mr: 1 }} />
             Confirm
           </MenuItem>
@@ -247,12 +377,99 @@ const AppointmentCard = ({ appointment, onUpdate, onCancel, userRole }) => {
         )}
         
         {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-          <MenuItem onClick={handleCancel} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={openCancelDialog} sx={{ color: 'error.main' }}>
             <Cancel sx={{ mr: 1 }} />
             Cancel
           </MenuItem>
         )}
       </Menu>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog
+        open={cancelDialog}
+        onClose={() => setCancelDialog(false)}
+        aria-labelledby="cancel-dialog-title"
+        aria-describedby="cancel-dialog-description"
+      >
+        <DialogTitle id="cancel-dialog-title">
+          Cancel Appointment
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="cancel-dialog-description">
+            Are you sure you want to cancel this appointment with{' '}
+            {userRole === 'patient' 
+              ? `Dr. ${appointment.doctor?.name}` 
+              : appointment.patient?.name
+            } on {format(new Date(appointment.appointmentDate), 'MMM dd, yyyy')} at {appointment.appointmentTime}?
+            <br />
+            <br />
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCancelDialog(false)} color="primary">
+            Keep Appointment
+          </Button>
+          <Button 
+            onClick={handleCancel} 
+            color="error" 
+            variant="contained"
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={20} /> : 'Cancel Appointment'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Appointment Dialog */}
+      <Dialog
+        open={confirmDialog}
+        onClose={() => setConfirmDialog(false)}
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <DialogTitle id="confirm-dialog-title">
+          Confirm Appointment
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-dialog-description">
+            Are you sure you want to confirm this appointment with{' '}
+            {appointment.patient?.name} on {format(new Date(appointment.appointmentDate), 'MMM dd, yyyy')} at {appointment.appointmentTime}?
+            <br />
+            <br />
+            The patient will be notified of the confirmation.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmAppointment} 
+            color="success" 
+            variant="contained"
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={20} /> : 'Confirm Appointment'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setNotification({ ...notification, open: false })} 
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Card>
   );
 };
@@ -273,8 +490,8 @@ const AppointmentsList = () => {
     
     // Get user role from localStorage or auth context
     const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setUserRole(user.role);
+    if (user && user.data && user.data.user) {
+      setUserRole(user.data.user.role);
     }
   }, []);
 
