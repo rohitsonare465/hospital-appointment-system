@@ -40,8 +40,11 @@ app.get('/api/test', (req, res) => {
 // Routes
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hospital-appointment-system', {
@@ -68,8 +71,8 @@ const startServer = (port) => {
 
         server.on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.log(`Port ${port} is busy, trying port ${port + 1}`);
-                startServer(port + 1);
+                console.log(`Port ${port} is busy, trying port ${parseInt(port) + 1}`);
+                startServer(parseInt(port) + 1);
             } else {
                 console.error('Server error:', err);
             }

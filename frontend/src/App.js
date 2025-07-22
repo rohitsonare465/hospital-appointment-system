@@ -5,6 +5,8 @@ import Register from './components/Register';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import UserManagement from './components/UserManagement';
+import BookAppointment from './components/BookAppointment';
+import AppointmentsList from './components/AppointmentsList';
 import './App.css';
 
 const theme = createTheme({
@@ -27,6 +29,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<UserManagement />} />
+          <Route path="/book-appointment" element={<BookAppointment />} />
+          <Route path="/appointments" element={<AppointmentsList />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
