@@ -1,70 +1,132 @@
-# Getting Started with Create React App
+# Hospital Appointment System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive hospital appointment management system with separate frontend and backend services.
 
-## Available Scripts
+## Project Structure
 
-In the project directory, you can run:
+```
+hospital-appointment-system/
+├── frontend/          # React.js frontend application
+├── backend/           # Node.js/Express backend API
+├── demo.sh           # Demo script for testing
+└── README.md         # This file
+```
 
-### `npm start`
+## Quick Start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB (running locally or MongoDB Atlas)
+- npm or yarn
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend Setup
+```bash
+cd backend
+npm install
+cp .env.example .env  # Configure your environment variables
+npm run seed          # Seed database with test data
+npm run dev           # Start development server
+```
 
-### `npm test`
+### Frontend Setup
+```bash
+cd frontend
+npm install
+npm start             # Start development server
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Features
 
-### `npm run build`
+### 🏥 User Management System
+- **View all users** (doctors and patients)
+- **Advanced search and filtering**
+- **Role-based access control**
+- **Pagination support**
+- **User statistics dashboard**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🔐 Authentication
+- **JWT-based authentication**
+- **Secure password hashing**
+- **Protected routes**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🎨 Modern UI/UX
+- **Material-UI components**
+- **Responsive design**
+- **Interactive user interface**
+- **Real-time search**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🧪 Testing
+- **Comprehensive backend API tests**
+- **Frontend component tests**
+- **Integration tests**
 
-### `npm run eject`
+## API Endpoints
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### User Management
+- `GET /api/users` - Get all users with filtering
+- `GET /api/users/doctors` - Get all doctors
+- `GET /api/users/patients` - Get all patients
+- `GET /api/users/stats` - Get user statistics
+- `GET /api/users/:id` - Get user by ID
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Default Ports
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:50001
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Test Credentials
+- **Doctor**: `test.doctor@test.com / password123`
+- **Patient**: `test.patient@test.com / password123`
 
-## Learn More
+## Scripts
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Root Directory
+```bash
+./demo.sh             # Run comprehensive demo and tests
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Backend Scripts
+```bash
+npm run dev           # Start development server
+npm start            # Start production server
+npm test             # Run tests
+npm run seed         # Seed database with test data
+```
 
-### Code Splitting
+### Frontend Scripts
+```bash
+npm start            # Start development server
+npm run build        # Build for production
+npm test             # Run tests
+npm run eject        # Eject from Create React App
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Environment Variables
 
-### Analyzing the Bundle Size
+### Backend (.env)
+```
+MONGODB_URI=mongodb://localhost:27017/hospital-appointment-system
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=90d
+NODE_ENV=development
+PORT=50001
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Contributing
 
-### Making a Progressive Web App
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## License
 
-### Advanced Configuration
+This project is licensed under the MIT License.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Support
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For support and questions, please open an issue in the repository.

@@ -61,6 +61,7 @@ const UserManagement = () => {
         { label: 'Patients', value: 'patients', icon: <PatientIcon /> }
     ];
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchUsers();
         fetchStats();
