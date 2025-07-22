@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api/users';
+// Use environment variable or fallback to localhost for development
+const BASE_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_URL = `${BASE_API_URL}/users`;
 
 // Get token from localStorage
 const getAuthToken = () => {

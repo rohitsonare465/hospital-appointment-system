@@ -7,7 +7,14 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:50001', 'http://127.0.0.1:50001'],
+    origin: [
+        'http://localhost:3000', 
+        'http://127.0.0.1:3000', 
+        'http://localhost:50001', 
+        'http://127.0.0.1:50001',
+        /\.vercel\.app$/,  // Allow all Vercel subdomains
+        process.env.FRONTEND_URL // Add environment variable for production frontend URL
+    ].filter(Boolean), // Remove any undefined values
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
